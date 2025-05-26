@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+ 
+/* Track */
+::-webkit-scrollbar-track {
+    background: #eee7e7;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #a58c79;
+    border-radius: 5px;
+}
+ 
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #a58c79;
+}
+
+/* Responsive enhancements */
+@layer utilities {
+    /* Improved table responsiveness */
+    .responsive-table {
+        @apply w-full overflow-x-auto;
+    }
+
+    .responsive-table table {
+        @apply min-w-full;
+    }
+
+    /* Touch-friendly buttons on mobile */
+    .touch-button {
+        @apply py-2.5 px-4 sm:py-2 sm:px-3;
+    }
+
+    /* Truncate text on mobile */
+    .mobile-truncate {
+        @apply truncate max-w-[100px] sm:max-w-[150px] md:max-w-none;
+    }
+    
+    /* Improved chart containers */
+    .chart-container {
+        @apply h-[250px] sm:h-[300px] md:h-[350px] overflow-visible !important;
+    }
+    
+    /* Responsive card layout */
+    .responsive-card {
+        @apply p-2 sm:p-3 md:p-4;
+    }
+    
+    /* Improved text visibility on small screens */
+    .mobile-text {
+        @apply text-sm sm:text-base;
+    }
+}
