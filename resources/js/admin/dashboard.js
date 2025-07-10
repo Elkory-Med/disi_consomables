@@ -484,4 +484,199 @@ function renderDeliveredProductsChart(data) {
             data.series && 
             Array.isArray(data.series) &&
             data.series.length > 0 &&
-            Array.isArr                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+            Array.isArray(data.series[0])) {
+            
+            productLabels = data.labels;
+            productData = data.series[0].map(val => parseInt(val) || 0);
+        }
+        
+        // Always use the proper format for ApexCharts bar chart
+        const options = {
+            series: [{
+                name: 'Quantité',
+                data: productData
+            }],
+            chart: { 
+                type: 'bar', 
+                height: Math.max(productLabels.length * 40, 300),
+                toolbar: { show: false }
+            },
+            plotOptions: { 
+                bar: { 
+                    horizontal: true,
+                    distributed: true
+                }
+            },
+            dataLabels: { enabled: false },
+            xaxis: {
+                categories: productLabels
+            },
+            colors: ['#10B981', '#4680FF', '#FFB64D', '#FF5370', '#7759de']
+        };
+        
+        // Make sure we destroy any existing chart first
+        window.ApexChartsInstances = window.ApexChartsInstances || {};
+        if (window.ApexChartsInstances.deliveredProductsChart) {
+            try {
+                window.ApexChartsInstances.deliveredProductsChart.destroy();
+            } catch (e) {
+                console.warn('Failed to destroy delivered products chart:', e);
+            }
+        }
+        
+        // Clear any existing content
+        element.innerHTML = '';
+        
+        // Create and render new chart
+        const chart = new ApexCharts(element, options);
+        chart.render();
+        
+        // Store the chart instance for later reference
+        window.ApexChartsInstances.deliveredProductsChart = chart;
+        
+    } catch (error) {
+        console.error('Error rendering delivered products chart:', error);
+        element.innerHTML = '<div class="alert alert-warning">Erreur de chargement du graphique</div>';
+    }
+}
+
+// Render User Distribution Chart
+function renderUserDistributionChart(data) {
+    const element = document.getElementById('userDistributionChart');
+    if (!element) return;
+    
+    try {
+        let userLabels = ['Aucun utilisateur'];
+        let userData = [0];
+        
+        if (data.labels && 
+            Array.isArray(data.labels) && 
+            data.labels.length > 0 &&
+            data.series && 
+            Array.isArray(data.series) &&
+            data.series.length > 0 &&
+            Array.isArray(data.series[0])) {
+            userLabels = data.labels;
+            userData = data.series[0].map(val => parseInt(val) || 0);
+        }
+        
+        const options = {
+            series: [{
+                name: 'Commandes',
+                data: userData
+            }],
+            chart: { 
+                type: 'bar', 
+                height: 320,
+                toolbar: { show: false }
+            },
+            plotOptions: { bar: { distributed: true } },
+            xaxis: { 
+                categories: userLabels
+            },
+            colors: ['#4680FF', '#10B981', '#FFB64D', '#FF5370', '#7759de']
+        };
+        
+        // Make sure we destroy any existing chart first
+        window.ApexChartsInstances = window.ApexChartsInstances || {};
+        if (window.ApexChartsInstances.userDistributionChart) {
+            try {
+                window.ApexChartsInstances.userDistributionChart.destroy();
+            } catch (e) {
+                console.warn('Failed to destroy user distribution chart:', e);
+            }
+        }
+        
+        // Clear any existing content
+        element.innerHTML = '';
+        
+        // Create and render new chart
+        const chart = new ApexCharts(element, options);
+        chart.render();
+        
+        // Store the chart instance for later reference
+        window.ApexChartsInstances.userDistributionChart = chart;
+        
+    } catch (error) {
+        console.error('Error rendering user distribution chart:', error);
+        element.innerHTML = '<div class="alert alert-warning">Erreur de chargement du graphique</div>';
+    }
+}
+
+// Render Order Trends Chart
+function renderOrderTrendsChart(data) {
+    const element = document.getElementById('orderTrendsChart');
+    if (!element) return;
+    
+    console.log('Rendering order trends chart with data:', data);
+    
+    try {
+        let trendLabels = [];
+        let trendData = [0, 0, 0, 0, 0, 0, 0];
+        
+        if (data.labels && 
+            Array.isArray(data.labels) && 
+            data.labels.length > 0 &&
+            data.series && 
+            Array.isArray(data.series) &&
+            data.series.length > 0 &&
+            Array.isArray(data.series[0])) {
+            trendLabels = data.labels;
+            trendData = data.series[0].map(val => parseInt(val) || 0);
+        } else {
+            // Generate default dates for the last week
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                trendLabels.push(date.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'}));
+            }
+        }
+        
+        const options = {
+            series: [{
+                name: 'Commandes',
+                data: trendData
+            }],
+            chart: { 
+                type: 'line', 
+                height: 320,
+                toolbar: { show: false }
+            },
+            xaxis: { 
+                categories: trendLabels
+            },
+            stroke: { 
+                curve: 'smooth',
+                width: 3
+            },
+            colors: ['#4680FF'],
+            markers: {
+                size: 5
+            }
+        };
+        
+        // Make sure we destroy any existing chart first
+        window.ApexChartsInstances = window.ApexChartsInstances || {};
+        if (window.ApexChartsInstances.orderTrendsChart) {
+            try {
+                window.ApexChartsInstances.orderTrendsChart.destroy();
+            } catch (e) {
+                console.warn('Failed to destroy order trends chart:', e);
+            }
+        }
+        
+        // Clear any existing content
+        element.innerHTML = '';
+        
+        // Create and render new chart
+        const chart = new ApexCharts(element, options);
+        chart.render();
+        
+        // Store the chart instance for later reference
+        window.ApexChartsInstances.orderTrendsChart = chart;
+        
+    } catch (error) {
+        console.error('Error rendering order trends chart:', error);
+        element.innerHTML = '<div class="alert alert-warning">Erreur de chargement du graphique</div>';
+    }
+} 

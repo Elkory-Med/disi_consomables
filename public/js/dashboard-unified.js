@@ -1153,4 +1153,76 @@
             });
         }
 
-        // Update the chart to show the first pag                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+        // Update the chart to show the first page of results (filtered or all)
+        updateChartWithPageData(chartId, 1);
+    }
+
+    // --- NEW: Helper to Update Chart Page View (used by search and pagination) ---
+    function updateChartWithPageData(chartId, targetPage) {
+        const paginationState = state.paginationStates[chartId];
+        const chartInstance = state.charts[chartId];
+        const container = document.getElementById(chartId);
+
+        if (!paginationState || !chartInstance || !container) {
+            console.error(`Cannot update page view, state missing for ${chartId}`);
+            return;
+        }
+
+        // Determine data source and total pages based on search term
+        const dataSource = paginationState.searchTerm ? paginationState.filteredData : paginationState.allData;
+        const totalItems = dataSource.length;
+        const totalPages = Math.ceil(totalItems / paginationState.limit);
+
+        // Ensure target page is valid within the current view (filtered or all)
+        targetPage = Math.max(1, Math.min(targetPage, totalPages > 0 ? totalPages : 1)); 
+
+        // Calculate slice range
+        const startIndex = (targetPage - 1) * paginationState.limit;
+        const endIndex = startIndex + paginationState.limit;
+        
+        // Get data for the target page
+        const pageData = dataSource.slice(startIndex, endIndex);
+        const newLabels = pageData.map(item => item.label);
+        const newSeries = pageData.map(item => item.value);
+
+        // Update chart options
+        chartInstance.updateOptions({
+            series: [{
+                data: newSeries
+            }],
+            xaxis: {
+                categories: newLabels
+            },
+            // Add a message if filtered data is empty
+            noData: {
+                text: paginationState.searchTerm && totalItems === 0 ? 'Aucun résultat trouvé.' : 'Chargement...', // Use default loading otherwise
+            }
+        }).then(() => {
+             // Update state and controls AFTER chart update is successful
+             paginationState.currentPage = targetPage;
+             setupPaginationControls(chartId, container, targetPage, totalPages); 
+             console.log(`Chart ${chartId} updated to page ${targetPage} (Search: '${paginationState.searchTerm}')`);
+        }).catch(error => {
+            console.error(`Error updating ${chartId} to page ${targetPage} with search:`, error);
+        });
+    }
+
+    // --- END NEW PAGINATION FUNCTIONS ---
+
+    // Make public methods available
+    window.dashboardManager = {
+        refresh: refreshDashboard,
+        initialize: initialize
+    };
+    
+    // Register with the DOM right away so other scripts can detect our presence
+    document.dispatchEvent(new CustomEvent('dashboardManagerLoaded', {
+        detail: { version: '1.0.0' }
+    }));
+    
+    // Auto-initialize if we're on the dashboard page
+    if (window.location.href.includes('/admin/dashboard')) {
+        // Wait a moment to ensure DOM is ready and any other scripts have loaded
+        setTimeout(initialize, 500);
+    }
+})(); 
